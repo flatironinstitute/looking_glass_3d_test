@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Fetal kidney clusters 3d interactive visualization</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		
+		<style>
+			body 
+			{ 
+			  margin: 0; 
+			}
+			canvas 
+			{
+			  width: 100%; 
+			  height: 100%; 
+			};
+		  </style>
+		<link rel="stylesheet" href="./css/jquery-ui.css">
+
+	</head>
+
+	<body>
+
+
+		<div id="container"></div>
+
+		<script src="./js/three.js"></script>
+		<script src="js/holoplay.js"></script>
+
+		<script src="./js/THREE.contourist.js"></script>
+		<script src="./js/OrbitControls.js"></script>
+		<script src="./js/jquery.min.js"></script>
+		<script src="./js/jquery-ui.js"></script>
+
+		<script src="./js/canvas_2d_widget_helper.js"></script>
+		<script src="./js/dual_canvas_helper.js"></script>
+	
+		<script src="./js/opacity_sliders.js"></script>
+
+		<script>
+
+		// Global flag, if true then do holoplay output to looking glass holographic display
+		var holographic = true;
+
+		var renderer, scene, camera;
+
+		var object, uniforms;
+		var category_to_info;
+		var minf, maxf, all_categories; //description;
+		var orbitControls;
+		var clock;
+		var holoplay;
+
+
+		function on_load(data) {
+			debugger;
+			all_categories = data;
+			//orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+			clock = new THREE.Clock();
+			init();
+			animate();
+		}
+
+		function on_load_failure() {
+			alert("Could not load local JSON data.\n" +
+			      "You may need to run a web server to avoid cross origin restrictions.")
+		}
+
+		jQuery.getJSON("./data/all_categories.json", on_load).fail(on_load_failure);
+		//jQuery.getJSON("test2.json", on_load).fail(on_load_failure);
+
+		function init() {
+			//debugger;
+
+			// local hack:
+			THREE.DEBUG = true;
+
+			camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.1, 10000 );
+			//camera.position.x = -20; //-354.2465689567709;
+			//camera.position.y = -20; //-172.1297558166637;
+			//camera.position.z = -20; //-181.10999904026764;
+			//camera.lookAt(new THREE.Vector3(20,20,20));
+
+			scene = new THREE.Scene();
+			var light = new THREE.PointLight( 0xffcc99 );
+			light.position.set( 1000, 1000, 1000 );
+			scene.add( light );
+			var light = new THREE.PointLight( 0x9999ff );
+			light.position.set( -1000, -1000, 1000 );
+			scene.add( light );
+			var light = new THREE.PointLight( 0xffff99 );
+			light.position.set( 1000, -1000, -1000);
+			scene.add( light );
+			var light = new THREE.PointLight( 0x99ffff );
+			light.position.set( -1000, 1000, -1000 );
+			scene.add( light );
+			var light = new THREE.AmbientLight( 0x777777 );
+			scene.add( light );
+
+			//var array = [];
+			//value = 0.8
+			//var truncate = (maxf - minf) * 0.022;
+			//var tmax = maxf - truncate;
+			//var tmin = minf + truncate;
+			//var limits = [tmin, tmax];
+			//var material = null;
+			//var hmaterial = new THREE.MeshNormalMaterial({color: 0xff000000});
+
+			category_to_info = {};
+
+			var center;
+
+			for (var i=0; i<all_categories.length; i++) {
+				var description = all_categories[i];
+				center = description.center;
+				//debugger;
+				var category = description.category;
+				description.r = (50 * i + 200) % 255;
+				description.g = (97 * i + 300) % 255;
+				description.b = (177 * i + 400) % 255;
+				//description.opacity = 1.0;
+
+				var hmaterial = new THREE.MeshLambertMaterial( { 
+					color: 0xff0000, 
+					transparent:true, 
+					opacity: 0.5,
+					alphaTest: 0.2
+				} );
+				//var hmaterial = null;
+				//var hmaterial = new THREE.MeshNormalMaterial( { color: 0xff0000, transparent:true, opacity: 0.5 } );
+
+				//hmaterial.transparent = true;
+				//hmaterial.opacity = 0.8;
+
+				var Abuffer = description["A"];
+				var Bbuffer = description["B"];
+				var Cbuffer = description["C"];
+				var Dbuffer = description["D"];
+				var fbuffer = description["f"];
+				var value = 9.8;
+				
+				//var material = new THREE.MeshLambertMaterial( { color: 0xffff00 } );
+				//var material = new THREE.MeshNormalMaterial( { morphTargest: true });
+				//material.side = THREE.DoubleSide;
+				
+				info = THREE.contourist.Tetrahedral(value, Abuffer, Bbuffer, Cbuffer, Dbuffer, fbuffer, hmaterial);
+				//info.material.wireframe = true;
+				scene.add(info.object);
+				description.material = info.material;
+				category_to_info[category] = description;
+			}
+
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setClearColor( 0x050505 );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			//renderer.setSize( 500, 500 );
+
+			holoplay = new HoloPlay(scene, camera, renderer, center);
+
+			orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+			orbitControls.userZoom = false;
+			orbitControls.userePan = false;
+			//debugger;
+			orbitControls.center.set(center[0], center[1], center[2]);
+			camera.position.x = - 10 *center[0]; //-354.2465689567709;
+			camera.position.y = - 10 *center[1]; //-172.1297558166637;
+			camera.position.z = - 10*center[2]; //-181.10999904026764;
+			camera.lookAt(new THREE.Vector3(center[0], center[1], center[2]));
+
+			var container = document.getElementById( 'container' );
+			container.appendChild( renderer.domElement );
+
+			//window.addEventListener( 'resize', onWindowResize, false );
+
+			//var categories = [
+			//	{category: 1, r: 200, g:0, b:0, opacity:1.0},
+			//];
+			/*
+			var update_colors = function(new_mappings) {
+				for (var category in new_mappings) {
+					var mapping = new_mappings[category];
+					var info = category_to_info[category];
+					info.material.opacity = mapping.opacity;
+					info.material.color.setRGB(mapping.r/256.0, mapping.g/256.0, mapping.b/256.0);
+				}
+			};
+
+			var colorizer = attach_opacity_selector($("#info"), all_categories, update_colors);
+
+			$("#dialog_link").on("click", function () {
+				colorizer.dialog("open")
+			})
+			*/
+			var R = 0;
+			var B = 100;
+			for (var category in category_to_info) {
+				var desc = category_to_info[category];
+				R = (R + 147) % 256;
+				B = (B + 131) % 256;
+				var G = (100 + R + B) % 256;
+				desc.material.color.setRGB(R/256.0, G/256.0, B/256.0);
+			}
+		}
+
+		function onWindowResize() {
+
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			renderer.setSize( window.innerWidth, window.innerHeight );
+
+		}
+
+		function animate() {
+
+			requestAnimationFrame( animate );
+
+			render();
+			//stats.update();
+
+		}
+
+		function render() {
+
+			var time = Date.now() * 0.001;
+
+            var delta = clock.getDelta();
+            orbitControls.update(delta);
+			//info.object.rotation.y = 0.25 * time;
+			// first time uniforms will not be initialized.
+			if (info.uniforms) {
+				//info.uniforms.f0.value = time % 1.0
+				//info.uniforms.opacity.value = Math.cos( 3 * time ) * 0.5 + 0.5;
+				//info.material.opacity = Math.cos( 3 * time ) * 0.5 + 0.5;
+			}
+			
+			for (var category in category_to_info) {
+				var desc = category_to_info[category];
+				desc.material.opacity =(1 + Math.sin(((+category)) + time * 0.5)) * 0.5;
+			}
+			if (!holographic) {
+				renderer.render( scene, camera );
+			} else {
+				holoplay.render();
+			}
+
+		}
+
+
+	</script>
+
+</body>
+
+</html>

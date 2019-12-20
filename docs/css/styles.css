@@ -1,0 +1,169 @@
+/* Stylesheet
+––––––––––––––––––––––––––––––––––––––––––––––––––*/
+html {
+  font-family: "Open Sans", sans-serif;
+  background-color: hsla(240, 7%, 81%, 0.15);
+  color: #222;
+}
+
+.container {
+  position: relative;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+/* For devices larger than 400px */
+@media (min-width: 400px) {
+  .container {
+    padding: 0 15px;
+  }
+}
+
+h2 {
+  max-width: 75rem;
+  margin: 0 auto;
+  text-align: center;
+  font-size: 2.5rem;
+  line-height: 1.2;
+}
+
+h4 {
+  font-size: 1.5rem;
+  letter-spacing: -0.08rem;
+  text-align: center;
+  margin: 0 1rem 1rem 1rem;
+}
+
+.intro-text {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding-top: 1.5rem;
+  text-align: center;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.container__header {
+  margin: 3rem 0;
+  text-align: center;
+}
+
+.container__viz {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  background-color: #ffffff;
+  padding: 2rem 0;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+}
+
+.container__footer {
+  margin: auto 0;
+  padding: 3rem 0;
+  text-align: center;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.column {
+  margin: 0 1rem;
+  width: 48%;
+}
+
+.viz {
+  width: 100%;
+  height: 80vh;
+  background-color: #bab5b5;
+  border-radius: 0.25rem;
+}
+
+.caption {
+  margin: 1rem 1rem 0 1rem;
+  min-height: 86px;
+}
+
+.caption-top-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: baseline;
+}
+
+.caption-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: baseline;
+  height: 30px;
+  font-size: 16px !important;
+}
+
+.protein-level {
+  border: 0;
+  color: #f6931f;
+  font-weight: bold;
+  margin-left: 5px;
+  max-width: 30px;
+}
+
+.protein-slider {
+  width: 300px;
+  margin: 0 auto;
+}
+
+#protein {
+  margin: 0;
+}
+
+#slider {
+  margin: 0 !important;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+input[type="checkbox"] {
+  display: inline;
+}
+
+.checkbox-col {
+  display: flex;
+  flex-direction: column;
+}
+
+span {
+  margin-left: 5px;
+  padding: 2px;
+  border-radius: 0.25rem;
+}
+
+span > span {
+  margin-left: 0;
+  color: #fff;
+}
+
+.catspan {
+  margin: 2px;
+  padding: 3px;
+}
+
+select {
+  /* height: 38px; */
+  padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
+  background-color: #fff;
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  box-shadow: none;
+  box-sizing: border-box;
+  margin-left: 10px;
+  width: 300px;
+}
